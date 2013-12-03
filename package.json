@@ -1,0 +1,28 @@
+{
+  "name"           : "greenwave-gop"
+, "version"        : "0.0.1"
+, "description"    : "node.js module to interface with the GOP service from Greenwave Reality"
+, "author"         : {
+    "name"         : "Marshall Rose"
+  , "email"        : "mrose17@gmail.com"
+  }
+, "repository"     : {
+    "type"         : "git"
+  , "url"          : "https://github.com/mrsoe17/node-pixelpusher.git"
+  } 
+, "bugs"           : {
+    "url"          : "https://github.com/mrsoe17/node-pixelpusher/issues"
+  }
+, "keywords"       : [ "Greenwave GOP Service" ]
+, "main"           : "./gop.js"
+, "dependencies"   : {
+    "deep-equal"   : "0.1.0"
+  , "json2xml"     : "0.1.1"
+  , "mdns"         : ">=0.0.7"
+  , "xml2json"     : "0.3.2"
+  }
+, "engines"        : {
+    "node"         : ">=0.8"
+  }
+, "readmeFilename" : "README.md"
+}
