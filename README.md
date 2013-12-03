@@ -16,31 +16,25 @@ API
     var Gop = require('gop');
 
 
-### Discover
+### Discover and Update
 
   var gop = new Gop().on('discover', function(controller) {
     controller.on('update', function() {
-      var d, device, i, r, room;
+      var d, device;
 
-      for (r in this.rooms) if (this.rooms.hasOwnProperty(r)) {
-        room = this.rooms[r];
+      for (d in this.devices) if (this.devices.hasOwnProperty(d)) {
+        device = this.devices[d];
 
-        for (d in room.devices) if (room.devices.hasOwnProperty(d)) {
-        device = room.devices[d];
+        console.log('    device '  + device.did + ': ' + device.name);          
 
-          console.log('    device '  + device.did + ': ' + device.name);          
+        controller.setBulbLevel(device.did, false); // off
+        controller.setBulbLevel(device.did, true);  // on
 
-          controller.setBulbLevel(device.did,   0); // off
-          controller.setBulbLevel(device.did, 100); // on
-
-          if (device.typecontroller.setBulbLevel(device.did,  50); // if 
-        }
+        if (device.type === 'multilevel') controller.setBulbLevel(device.did, true, 50);
       }
     }).on('error', function(err) {
-
-  // emitted when a background task fails...
-
+      console.log(this.tag + ': ' + err.message);
     });
-  }.on('error', function(err) {
+  }).on('error', function(err) {
     console.log('oops: ' + err.message);
   });

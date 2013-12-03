@@ -117,7 +117,7 @@ Controller.prototype.getCarouselInfo = function(self, oops) {
   self.roundtrip(self, 'POST', 'RoomGetCarousel',
                  { gip: { version: 1, token: self.token, fields: 'name,power,product,class,image,imageurl,control' } },
                  function(err, result) {
-    var i, room, rooms;
+    var devices, i, j, room, rooms;
 
     if (!!err) return self.logger.error(self.tag, { event: 'RoomGetCarousel', diagnostic: err.message });
 
@@ -129,36 +129,50 @@ Controller.prototype.getCarouselInfo = function(self, oops) {
     }
 
     rooms = util.isArray(result.results.room) ? result.results.room : [ result.results.room ];
+    devices = {};
     for (i = 0; i < rooms.length; i++) {
       room = rooms[i];
 
       room.devices = util.isArray(room.device) ? room.device : [ room.device ];
       delete(room.device);
+
+      for (j = 0; j < room.devices.length; j++) devices[room.devices[j].did] = room.devices[j];
     }
 
     self.timer = setTimeout(function() { self.getCarouselInfo(self); }, 30 * 1000);
 
     if ((!!self.rooms) && (deepEqual(self.rooms, rooms))) return;
 
+    self.devices = devices;
     self.rooms = rooms;
     return self.emit('update');
   });
 };
 
-Controller.prototype.setBulbLevel = function(did, level) {
+Controller.prototype.setBulbLevel = function(did, onoff, level) {
   var gip;
 
   var self = this;
 
-  gip = { version: 1, token: self.token, did: did, val: level };
-  if ((level === 0) || (level === 100)) gip.value = level && 1; else gip.type = 'level';
+  gip = { version: 1, token: self.token, did: did };
+  if ((!onoff) && (!level)) {
+    gip.value = 0;
+  } else if ((onoff) && (!level)) {
+    gip.value = 1;
+  } else {
+    gip.type = 'level';
+    gip.val = level;
+  }
+
   self.roundtrip(self, 'POST', 'DeviceSendCommand', { gip: gip }, function(err, result) {
     if (!!self.timer) clearTimeout(self.timer);
     self.timer = setTimeout(function() { self.getCarouselInfo(self); }, 0);
 
     if (!!err) return self.logger.error(self.tag, { event: 'DeviceSendCommand', diagnostic: err.message });
 
-    if (!result.results) self.logger.warning(self.tag, { event: 'DeviceSendCommand', diagnostic: 'failed' });
+    if (!result.results) return self.logger.warning(self.tag, { event: 'DeviceSendCommand', diagnostic: 'failed' });
+
+    if ((!!gip.type) && (onoff !== self.devices[did].state)) self.setBulbLevel(did, onoff);
   });
 };
 
