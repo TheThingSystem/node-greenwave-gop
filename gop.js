@@ -214,7 +214,7 @@ Controller.prototype.roundtrip = function(self, method, cmd, data, cb) {
       var errors, result, results;
 
       try {
-        result = JSON.parse(xml2json(content, { coerce: false }));
+        result = JSON.parse(xml2json(content, { coerce: false, sanitize: false }));
       } catch(ex) {
         return cb(ex, 'error');
       }
