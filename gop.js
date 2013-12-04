@@ -36,7 +36,8 @@ var Gop = function(options) {
     service.event = 'up';
     self.logger.debug('_gop._tcp', service);
 
-    params = { host    : service.host
+    params = { name    : service.name
+             , host    : service.host
              , port    : service.port
              , path    : ((!!service.txtRecord) && service.txtRecord.path) || '/'
              , ipaddrs : service.addresses
