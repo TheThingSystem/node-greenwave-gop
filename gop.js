@@ -217,7 +217,7 @@ Controller.prototype.roundtrip = function(self, method, cmd, data, cb) {
       try {
         result = JSON.parse(xml2json(content, { coerce: false, sanitize: false }));
       } catch(ex) {
-        return cb(ex, 'error');
+        return cb(ex);
       }
       if (!result.gip) return cb(new Error('invalid response'));
 
