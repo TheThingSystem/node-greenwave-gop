@@ -8,10 +8,10 @@
   }
 , "repository"     : {
     "type"         : "git"
-  , "url"          : "https://github.com/TheThingSystem/node-pixelpusher.git"
+  , "url"          : "https://github.com/TheThingSystem/node-greenwave-gop.git"
   } 
 , "bugs"           : {
-    "url"          : "https://github.com/TheThingSystem/node-pixelpusher/issues"
+    "url"          : "https://github.com/TheThingSystem/node-greenwave-gop/issues"
   }
 , "keywords"       : [ "Greenwave GOP Service" ]
 , "main"           : "./gop.js"
