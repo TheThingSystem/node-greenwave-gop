@@ -1,6 +1,6 @@
 {
-  "name"           : "greenwave-gop"
-, "version"        : "0.0.1"
+  "name"           : "node-greenwave-gop"
+, "version"        : "0.0.2"
 , "description"    : "node.js module to interface with the GOP service from Greenwave Reality"
 , "author"         : {
     "name"         : "Marshall Rose"
