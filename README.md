@@ -7,7 +7,7 @@ A node.js module to interface with the GOP service from Greenwave Reality.
 Install
 -------
 
-    npm install gop
+    npm install greenwave-gop
 
 
 Read Carefully
@@ -37,7 +37,7 @@ API
 
 ### Load
 
-    var Gop = require('gop');
+    var Gop = require('greenwave-gop');
 
 
 ### Discover and Update
