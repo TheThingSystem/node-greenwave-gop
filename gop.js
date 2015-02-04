@@ -2,12 +2,13 @@
 
 var deepEqual   = require('deep-equal')
   , Emitter     = require('events').EventEmitter
-  , http        = require('http')
+  , https       = require('https')
   , json2xml    = require('json2xml')
   , mdns        = require('mdns')
   , querystring = require('querystring')
   , url         = require('url')
   , util        = require('util')
+  , uuid        = require('node-uuid')
   , xml2json    = require('xml2json').toJson
   ;
 
@@ -25,7 +26,7 @@ var Gop = function(options) {
 
   if (!(self instanceof Gop)) return new Gop(options);
 
-  self.options = options;
+  self.options = options || {};
   self.logger = DEFAULT_LOGGER;
   self.controllers = {};
 
@@ -58,6 +59,17 @@ var Gop = function(options) {
 util.inherits(Gop, Emitter);
 
 
+Gop.prototype.oneshot = function(bridge) {
+  var params, self;
+
+  params = url.parse(bridge);
+  params.ipaddrs = [ params.hostname ];
+  self = Controller(params);
+  self.login(self);
+
+  return self;
+};
+
 var Controller = function(params) {
   var path;
 
@@ -72,8 +84,11 @@ var Controller = function(params) {
 
   path = params.path;
   if (path.lastIndexOf('/') !== (path.length - 1)) path += '/';
-  self.options = url.parse('http://' + self.params.ipaddrs[0] + ':' + self.params.port + path + 'gwr/gop.php');
+  self.options = url.parse('https://' + self.params.ipaddrs[0] + ':' + self.params.port + path + 'gwr/gop.php');
   self.options.agent = false;
+  self.options.rejectUnauthorized = false;
+  if (!self.params.email) self.params.email = uuid.v4();
+  if (!self.params.password) self.params.password = self.params.email;
 
   self.timer = null;
 };
@@ -81,11 +96,16 @@ util.inherits(Controller, Emitter);
 
 Controller.prototype.login = function(self, oops) {
   self.roundtrip(self, 'POST', 'GWRLogin',
-                 { gip: { version: 1, email: '', password: '18d718bcc71b6e353394dc0f6f9f6f67b60f6036b59828b8bc7bd7ca31e5f5d2' }
+                 { gip: { version: 1, email: self.params.email, password: self.params.password }
                  }, function(err, result) {
+    var rc;
+
     if (!!err) return self.logger.error(self.tag, { event: 'GWRLogin', diagnostic: err.message });
 
     if ((!result.results) || (!result.results.token)) {
+      rc = result && result.errors && result.errors.rc;
+      if (rc === '404') return self.emit('error', new Error('button not pushed'));
+
       if (!oops) oops = 0;
       self.logger.warning(self.tag, { event: 'login', retry: '60 seconds' });
       if (oops > 2) return self.emit('error', new Error('unable to login'));
@@ -146,7 +166,7 @@ Controller.prototype.getCarouselInfo = function(self, oops) {
 
     self.devices = devices;
     self.rooms = rooms;
-    return self.emit('update');
+    return self.emit('update', self);
   });
 };
 
@@ -205,7 +225,7 @@ Controller.prototype.roundtrip = function(self, method, cmd, data, cb) {
     self.options.headers['Content-Length'] = body.length;
   }
 
-  http.request(self.options, function(response) {
+  https.request(self.options, function(response) {
     var content = '';
 
     response.setEncoding('utf8');

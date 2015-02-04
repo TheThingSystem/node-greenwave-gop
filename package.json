@@ -1,6 +1,6 @@
 {
   "name"           : "greenwave-gop"
-, "version"        : "0.0.2"
+, "version"        : "1.0.0"
 , "description"    : "node.js module to interface with the GOP service from Greenwave Reality"
 , "author"         : {
     "name"         : "Marshall Rose"
@@ -18,7 +18,8 @@
 , "dependencies"   : {
     "deep-equal"   : "0.1.0"
   , "json2xml"     : "0.1.1"
-  , "mdns"         : "git://github.com/TheThingSystem/node_mdns.git"
+  , "mdns"         : "2.2.0"
+  , "node-uuid"    : "1.4.1"
   , "xml2json"     : "0.3.2"
   }
 , "engines"        : {
