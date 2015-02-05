@@ -29,7 +29,8 @@ new Gop().on('discover', function(controller) {
   console.log('oops: ' + err.message);
 }).logger.debug = function() {};
 
+/*
 new Gop().oneshot('https://192.168.1.70:443').on('update', update).on('error', function(err) {
   console.log('oops: ' + err.message);
 });
-
+ */

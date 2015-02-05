@@ -6,6 +6,7 @@ var deepEqual   = require('deep-equal')
   , json2xml    = require('json2xml')
   , mdns        = require('mdns')
   , querystring = require('querystring')
+  , ssdp        = require('node-ssdp')
   , url         = require('url')
   , util        = require('util')
   , uuid        = require('node-uuid')
@@ -55,6 +56,30 @@ var Gop = function(options) {
   }).on('error', function(err) {
     self.logger.error('_gop._tcp', { event: 'mdns', diagnostic: err.message });
   }).start();
+
+  new ssdp().on('response', function(msg /* , rinfo */) {
+    var controller, i, info, j, location, lines, params;
+
+    lines = msg.toString().split("\r\n");
+    info = {};
+    for (i = 1; i < lines.length; i++) {
+      j = lines[i].indexOf(':');
+      if (j <= 0) break;
+      info[lines[i].substring(0, j)] = lines[i].substring(j + 1).trim();
+    }
+
+    if (info.ST !== 'urn:greenwavereality-com:service:gop:1') return;
+    location = info.LOCATION || info.Location;
+    if (!!self.controllers[location]) return;
+
+    params = url.parse(location);
+    params.ipaddrs = [ params.hostname ];
+    controller = new Controller(params);
+    self.controllers[location] = controller;
+
+    controller.login(controller);
+    self.emit('discover', controller);
+  }).search('urn:greenwavereality-com:service:gop:1');
 };
 util.inherits(Gop, Emitter);
 
